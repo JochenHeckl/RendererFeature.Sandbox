@@ -1,0 +1,64 @@
+#pragma kernel JumpFlood
+#pragma target 4.5
+
+RWTexture2D<float4> outputBuffer;   // xy = seed position, z = distanceSq
+Texture2D<float4> inputBuffer;      // previous step
+
+int2 bufferResolution;
+int jumpDistance; // current jump distance (e.g. 128, 64, 32 ...)
+
+[numthreads(8, 8, 1)]
+void JumpFlood(uint3 id : SV_DispatchThreadID)
+{
+    if (id.x >= bufferResolution.x || id.y >= bufferResolution.y)
+    {
+        return;
+    }
+
+    // Read current best
+    float4 best = inputBuffer.Load(int3(id.xy, 0));
+    float2 bestSeed = best.xy;
+    float bestDist = best.z;
+
+    // If no seed yet, initialize distance as very large
+    if (bestSeed.x < 0)
+    {
+        bestDist = 1e20;
+    }
+
+    // Check 8 neighbors at Jump distance
+    for (int y = -1; y <= 1; y++)
+    {
+        for (int x = -1; x <= 1; x++)
+        {
+            int2 sample = id.xy + int2(x, y) * jumpDistance;
+
+            if ( sample.x < 0
+                || sample.y < 0
+                || sample.x >= bufferResolution.x
+                || sample.y >= bufferResolution.y)
+            {
+                continue;
+            }
+
+            float4 candidate = inputBuffer.Load(int3(sample, 0));
+            float2 seedPos = candidate.xy;
+
+            if (seedPos.x < 0)
+            {
+                continue;
+            }
+
+            float2 delta = seedPos - id.xy;
+            float distSq = dot(delta, delta);
+
+            if (distSq < bestDist)
+            {
+                bestDist = distSq;
+                bestSeed = seedPos;
+            }
+        }
+    }
+
+    outputBuffer[id.xy] = float4(bestSeed, bestDist, 0);
+}
