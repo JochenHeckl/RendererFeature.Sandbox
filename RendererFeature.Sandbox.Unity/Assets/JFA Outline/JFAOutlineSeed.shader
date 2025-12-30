@@ -1,57 +1,59 @@
-Shader "JFA Outline - Seed"
+Shader "Custom/NewUnlitUniversalRenderPipelineShader"
 {
     SubShader
     {
-        // Tags { "RenderPipeline" = "UniversalPipeline" }
+        Tags { "RenderType" = "Opaque" "RenderPipeline" = "UniversalPipeline" }
 
         Pass
         {
             Name "JFA Outline - Seed"
-            // Tags { "LightMode" = "UniversalForward" }
 
-            // We only need depth testing (when a depth attachment is bound),
-            // but we do NOT want to modify the camera depth.
             ZWrite Off
-            ZTest Off
+            ZTest Always
             Cull Off
             Blend Off
 
             HLSLPROGRAM
+
+            #pragma enable_d3d11_debug_symbols
             #pragma target 4.5
-            #pragma vertex VertexShader
-            #pragma fragment PixelShader
-            #pragma multi_compile_instancing
+            #pragma vertex vert
+            #pragma fragment frag
 
-            struct VSInput
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+
+            struct Attributes
             {
-                float3 positionOS : POSITION;
+                float4 positionOS : POSITION;
             };
 
-            struct PSInput
+            struct VSOut
             {
-                float2 position : SV_Position;
+                float4 positionHCS : SV_Position;
             };
 
-            struct PSOutput
+            VSOut vert(Attributes input)
             {
-                float2 position;
-                float distance;
-                float instanceId; // reserved for future use in instanceId
-            };
-
-            PSInput VertexShader(VSInput input)
-            {
-                PSInput output;
-
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-
+                VSOut output;
+                output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
                 return output;
             }
 
-            PSOutput PixelShader(SeedData input) : SV_Target
+            float4 frag(VSOut input) : SV_Target
             {
-                return PSOutput(input.position.xy, 0.0, 0.0);
+                float2 pixelPos = input.positionHCS.xy;
+
+                float sdfDistance = 0.0;  // seed distance
+                float idPlaceholder = 0.0; // future use (instance id, mask, etc.)
+
+                return float4(
+                    pixelPos.x,
+                    pixelPos.y,
+                    sdfDistance,
+                    idPlaceholder
+                );
             }
+
             ENDHLSL
         }
     }

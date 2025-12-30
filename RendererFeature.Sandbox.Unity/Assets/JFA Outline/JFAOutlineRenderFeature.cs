@@ -1,16 +1,7 @@
-using System.IO;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-/// <summary>
-/// Jump Flood Algorithm (JFA) based screen-space outline for URP (Unity 6.x / URP 17+).
-///
-/// Pipeline overview:
-/// 1) Render selected objects into a float seed texture storing per-pixel screen coordinates.
-/// 2) Run Jump Flood iterations in a compute shader to propagate nearest seed + squared distance.
-/// 3) Composite outline on top of the camera color target.
-/// </summary>
 public class JFAOutlineRenderFeature : ScriptableRendererFeature
 {
     [SerializeField]
@@ -21,12 +12,13 @@ public class JFAOutlineRenderFeature : ScriptableRendererFeature
 
     public override void Create()
     {
-        ValidateSettings();
+        if (ValidateSettings())
+        {
+            seedMaterial = CoreUtils.CreateEngineMaterial(settings.seedShader);
+            outlineMaterial = CoreUtils.CreateEngineMaterial(settings.outlineShader);
 
-        seedMaterial = CoreUtils.CreateEngineMaterial(settings.seedShader);
-        outlineMaterial = CoreUtils.CreateEngineMaterial(settings.outlineShader);
-
-        pass = new JFAOutlinePass(settings, seedMaterial, outlineMaterial);
+            pass = new JFAOutlinePass(settings, seedMaterial, outlineMaterial);
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -73,35 +65,44 @@ public class JFAOutlineRenderFeature : ScriptableRendererFeature
             return;
         }
 
-        if (settings.outlineLayer.value == 0)
-        {
-            return;
-        }
-
         renderer.EnqueuePass(pass);
     }
 
-    private void ValidateSettings()
+    private bool ValidateSettings()
     {
         if (settings.seedShader == null)
         {
-            throw new InvalidDataException(
+            Debug.LogError(
                 "You must supply a seed shader. If in doubt, drag JFAOutlineSeed.shader here that comes with this package."
             );
+
+            return false;
         }
 
         if (settings.outlineShader == null)
         {
-            throw new InvalidDataException(
+            Debug.LogError(
                 "You must supply an outline shader. If in doubt, drag JFAOutline.shader here that comes with this package."
             );
+
+            return false;
         }
 
         if (settings.jfaComputeStepShader == null)
         {
-            throw new InvalidDataException(
+            Debug.LogError(
                 "You must supply a jfaComputeStepShader. If in doubt, drag JFAComputeStep.compute here that comes with this package."
             );
+
+            return false;
         }
+
+        if (settings.outlineLayer.value == 0)
+        {
+            Debug.LogError("JFA Outline layer mask is 0. No outlines will be drawn.");
+            return false;
+        }
+
+        return true;
     }
 }

@@ -98,5 +98,8 @@ InitTestScene*.unity*
 # Auto-generated scenes by play mode tests
 /[Aa]ssets/[Ii]nit[Tt]est[Ss]cene*.unity*
 
+/[Aa]ssets/[Ss]amples
+/[Aa]ssets/[Ss]amples.meta
+
 #ignore IDE settings
 .vscode

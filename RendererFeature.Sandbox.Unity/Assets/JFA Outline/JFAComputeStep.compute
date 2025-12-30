@@ -1,64 +1,69 @@
 #pragma kernel JumpFlood
 #pragma target 4.5
+#pragma enable_d3d11_debug_symbols
 
-RWTexture2D<float4> outputBuffer;   // xy = seed position, z = distanceSq
-Texture2D<float4> inputBuffer;      // previous step
+// xy = seed position (center of the pixel), z = distance squared
+// previous step initially cleared to (-1, -1, 1e10, 0)
+Texture2D<float4> inputBuffer;
+RWTexture2D<float4> outputBuffer;   
 
 int2 bufferResolution;
 int jumpDistance; // current jump distance (e.g. 128, 64, 32 ...)
 
+float4 UpdateCurrent(float4 current, int2 currentId, int OffsetX, int OffsetY)
+{
+    int2 sampleOffset = currentId + int2(OffsetX, OffsetY) * jumpDistance;
+
+    if ( sampleOffset.x < 0
+        || sampleOffset.y < 0
+        || sampleOffset.x >= bufferResolution.x
+        || sampleOffset.y >= bufferResolution.y)
+    {
+        // sampleOffset is outside of buffer
+        return current;
+    }
+
+    float4 candidate = inputBuffer.Load(int3(sampleOffset, 0));
+    
+    if (candidate.x < 0)
+    {
+        // This candidate is not seeded yet
+        return current;
+    }
+
+    // we refer to the pixel center hereto calculate distances
+    float2 pixelCenter = (float2)currentId + float2(0.5, 0.5);
+    float2 deltaPos = candidate.xy - pixelCenter;
+    float distSq = dot(deltaPos, deltaPos);
+
+    if (distSq < current.z)
+    {
+        return float4( candidate.xy, distSq, current.w );
+    }
+
+    return current;
+}
+
 [numthreads(8, 8, 1)]
-void JumpFlood(uint3 id : SV_DispatchThreadID)
+void JumpFlood(int3 id : SV_DispatchThreadID)
 {
     if (id.x >= bufferResolution.x || id.y >= bufferResolution.y)
     {
         return;
     }
 
-    // Read current best
-    float4 best = inputBuffer.Load(int3(id.xy, 0));
-    float2 bestSeed = best.xy;
-    float bestDist = best.z;
+    float4 current = inputBuffer.Load(int3(id.xy, 0));
+    
+    current = UpdateCurrent(current, id.xy, -1, -1);
+    current = UpdateCurrent(current, id.xy, -1, 0);
+    current = UpdateCurrent(current, id.xy, -1, 1);
+    
+    current = UpdateCurrent(current, id.xy, 0, -1);
+    current = UpdateCurrent(current, id.xy, 0, 1);
 
-    // If no seed yet, initialize distance as very large
-    if (bestSeed.x < 0)
-    {
-        bestDist = 1e20;
-    }
+    current = UpdateCurrent(current, id.xy, 1, -1);
+    current = UpdateCurrent(current, id.xy, 1, 0);
+    current = UpdateCurrent(current, id.xy, 1, 1);
 
-    // Check 8 neighbors at Jump distance
-    for (int y = -1; y <= 1; y++)
-    {
-        for (int x = -1; x <= 1; x++)
-        {
-            int2 sample = id.xy + int2(x, y) * jumpDistance;
-
-            if ( sample.x < 0
-                || sample.y < 0
-                || sample.x >= bufferResolution.x
-                || sample.y >= bufferResolution.y)
-            {
-                continue;
-            }
-
-            float4 candidate = inputBuffer.Load(int3(sample, 0));
-            float2 seedPos = candidate.xy;
-
-            if (seedPos.x < 0)
-            {
-                continue;
-            }
-
-            float2 delta = seedPos - id.xy;
-            float distSq = dot(delta, delta);
-
-            if (distSq < bestDist)
-            {
-                bestDist = distSq;
-                bestSeed = seedPos;
-            }
-        }
-    }
-
-    outputBuffer[id.xy] = float4(bestSeed, bestDist, 0);
+    outputBuffer[id.xy] = current;
 }

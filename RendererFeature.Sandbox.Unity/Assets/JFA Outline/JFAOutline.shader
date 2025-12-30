@@ -1,9 +1,8 @@
-Shader "JFA Outline - Outline"
+Shader "JFAOutlineOutline"
 {
     Properties
     {
-        [HideInInspector] sdfbuffer("sdfBuffer", 2D) = "black" {}
-        outlineWidth("Outline Width (Pixels)", Float) = 1f
+        outlineWidth("Outline Width (Pixels)", Float) = 1
         outlineColor("Outline Color", Color) = (0, 0, 0, 0)
     }
 
@@ -18,10 +17,12 @@ Shader "JFA Outline - Outline"
             // Fullscreen overlay
             ZWrite Off
             ZTest Always
-            Cull Off
+            Cull Back
             Blend SrcAlpha OneMinusSrcAlpha
 
             HLSLPROGRAM
+
+            #pragma enable_d3d11_debug_symbols
             #pragma target 4.5
             #pragma vertex Vert
             #pragma fragment Frag
@@ -60,13 +61,10 @@ Shader "JFA Outline - Outline"
             {
                 float4 sdfValue = SAMPLE_TEXTURE2D(sdfBuffer, sampler_PointClamp, input.texcoord);
                 float distSq = sdfValue.z;
+                float outlineWidthSquared = outlineWidth * outlineWidth;
 
-                float width = max(outlineWidth, 1.0f);
-                float outlineWidthSquared = width * width;
-
-                // distSq == 0 : this is a seed pixel (no outline)
-                // distSq < maxDistSq : within outline thickness
-
+                
+                // (distSq == 0) is a seed pixel (so no outline)                
                 if ((distSq > 0.0) && (distSq <= outlineWidthSquared))
                 {
                     return outlineColor;
@@ -74,6 +72,7 @@ Shader "JFA Outline - Outline"
 
                 return float4(0.0, 0.0, 0.0, 0.0);
             }
+            
             ENDHLSL
         }
     }

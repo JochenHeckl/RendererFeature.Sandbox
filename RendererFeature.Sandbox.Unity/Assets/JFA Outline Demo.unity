@@ -630,7 +630,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1160234426
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1029,7 +1029,7 @@ GameObject:
   - component: {fileID: 3521683707466773123}
   - component: {fileID: 7218820239248278125}
   - component: {fileID: 5059788001672154254}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Back_Part_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1047,7 +1047,7 @@ GameObject:
   - component: {fileID: 4024233217588088173}
   - component: {fileID: 7133170251085893050}
   - component: {fileID: 2329960007035633681}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Back_Part_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1134,7 +1134,7 @@ GameObject:
   - component: {fileID: 2355653191682247708}
   - component: {fileID: 1172976811987324086}
   - component: {fileID: 7499497021674395898}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Rings
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1216,7 +1216,7 @@ GameObject:
   - component: {fileID: 2667994382452280172}
   - component: {fileID: 6476517947687084780}
   - component: {fileID: 4229607126010098906}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stand_Part_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1247,7 +1247,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3874231289254137071}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1327,7 +1327,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1448501443085806459}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1386,7 +1386,7 @@ GameObject:
   - component: {fileID: 1296738678326357226}
   - component: {fileID: 8988423917994663629}
   - component: {fileID: 7476877889312545141}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Bottom_Cap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1566,7 +1566,7 @@ GameObject:
   - component: {fileID: 8577614354117532858}
   - component: {fileID: 3886155221346378004}
   - component: {fileID: 8097064273423272568}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Ball_Part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1592,7 +1592,7 @@ GameObject:
   - component: {fileID: 750974001258836848}
   - component: {fileID: 285757673750222148}
   - component: {fileID: 7120302010817048496}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stand_Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1783,7 +1783,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7823694312774259421}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: UnityMaterialBall_Gold
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1875,7 +1875,7 @@ GameObject:
   - component: {fileID: 6233777116457369307}
   - component: {fileID: 7105339341735408668}
   - component: {fileID: 9102376964654609776}
-  m_Layer: 2
+  m_Layer: 0
   m_Name: Back_Part_Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1942,7 +1942,7 @@ GameObject:
   - component: {fileID: 7404782291424719770}
   - component: {fileID: 5691571643838763082}
   - component: {fileID: 8496002568620297863}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Stand_Part_2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1960,7 +1960,7 @@ GameObject:
   - component: {fileID: 6754955248402670120}
   - component: {fileID: 1507839029914702275}
   - component: {fileID: 4711151955290684885}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Front_Part
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -2042,7 +2042,7 @@ GameObject:
   - component: {fileID: 5270582871199435135}
   - component: {fileID: 7667906935820937665}
   - component: {fileID: 3274465372524955329}
-  m_Layer: 2
+  m_Layer: 3
   m_Name: Front_Part_Logo
   m_TagString: Untagged
   m_Icon: {fileID: 0}

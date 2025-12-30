@@ -46,7 +46,7 @@ internal class JFAOutlinePass : ScriptableRenderPass
         outlinePassName
     );
 
-    private static readonly Color seedClearColor = new Color(-1f, -1f, 0f, 0f);
+    private static readonly Color seedClearColor = new Color(-1f, -1f, 1e10f, 1f);
 
     private static readonly int inputBufferId = Shader.PropertyToID("inputBuffer");
     private static readonly int outputBufferId = Shader.PropertyToID("outputBuffer");
@@ -83,6 +83,8 @@ internal class JFAOutlinePass : ScriptableRenderPass
         this.seedMaterial = seedMaterial;
         this.outlineMaterial = outlineMaterial;
 
+        renderPassEvent = settings.renderPassEvent;
+
         jfaKernel = settings.jfaComputeStepShader.FindKernel("JumpFlood");
         settings.jfaComputeStepShader.GetKernelThreadGroupSizes(
             jfaKernel,
@@ -108,8 +110,6 @@ internal class JFAOutlinePass : ScriptableRenderPass
         // Derive our internal texture layout from the active camera color.
         // This ensures we match render scale and other per-camera target settings.
         TextureDesc sdfBufferDesc = renderGraph.GetTextureDesc(cameraColor);
-        sdfBufferDesc.name = "JFA_Outline_sdfBuffer";
-
         int width = sdfBufferDesc.width;
         int height = sdfBufferDesc.height;
 
@@ -118,13 +118,14 @@ internal class JFAOutlinePass : ScriptableRenderPass
         sdfBufferDesc.msaaSamples = MSAASamples.None;
         sdfBufferDesc.format = GraphicsFormat.R32G32B32A32_SFloat;
         sdfBufferDesc.clearBuffer = false;
-        sdfBufferDesc.enableRandomWrite = false;
+        sdfBufferDesc.enableRandomWrite = true;
 
-        var sdfBuffers = new TextureHandle[2]
-        {
-            renderGraph.CreateTexture(sdfBufferDesc),
-            renderGraph.CreateTexture(sdfBufferDesc),
-        };
+        sdfBufferDesc.name = "JFA_Outline_sdfBuffer 0";
+        var buffer0 = renderGraph.CreateTexture(sdfBufferDesc);
+        sdfBufferDesc.name = "JFA_Outline_sdfBuffer 1";
+        var buffer1 = renderGraph.CreateTexture(sdfBufferDesc);
+
+        var sdfBuffers = new TextureHandle[2] { buffer0, buffer1 };
 
         using (
             var builder = renderGraph.AddRasterRenderPass<SeedPassData>(
@@ -228,7 +229,9 @@ internal class JFAOutlinePass : ScriptableRenderPass
                 );
             }
 
-            nextCurrentIndex = nextCurrentIndex++ % 2;
+            jump /= 2;
+
+            nextCurrentIndex = (nextCurrentIndex + 1) % 2;
             current = sdfBuffers[nextCurrentIndex];
             next = sdfBuffers[nextCurrentIndex == 0 ? 1 : 0];
         }
