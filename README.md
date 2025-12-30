@@ -6,7 +6,7 @@ A Repository to experiment with Unity's new Render Graph API / RendererFeatures.
 
 This is an outline render feature that uses the jump flood algorithm in a compute shader.
 
-`<img alt="Unity showing the JFA Outline renderer feature with the inspector" src="./Images/JFA Outline.png" width="1280" height="696"/>`
+<img alt="Unity showing the JFA Outline renderer feature with the inspector" src="Images/JFA Outline.png" width="1280" height="696"/>
 
 ### How to use:
 
