@@ -13,6 +13,13 @@ Shader "Custom/NewUnlitUniversalRenderPipelineShader"
             Cull Off
             Blend Off
 
+            Stencil
+            {
+                Ref 1
+                Comp Equal
+                Pass Keep
+            }
+
             HLSLPROGRAM
 
             #pragma enable_d3d11_debug_symbols
