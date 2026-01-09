@@ -1,4 +1,4 @@
-Shader "JFAOutlineOutline"
+Shader "JFA Outline - Outline"
 {
     Properties
     {
